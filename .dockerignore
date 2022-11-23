@@ -1,0 +1,14 @@
+/.dockerignore
+/.gitignore
+/Dockerfile
+/docker-compose.yml
+/venv/*
+/staticfiles/*
+/.git/*
+/static/*
+/.idea/*
+/./assets/*
+/resume.sqlite3
+/config/.env
+/config/resume_nginx.conf
+/templates/*
