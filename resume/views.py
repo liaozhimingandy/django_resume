@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from itertools import chain
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.contrib.admin.utils import label_for_field, display_for_field
 from django.forms import fields_for_model
@@ -14,19 +15,25 @@ from django.views.generic import UpdateView, DetailView, ListView
 from django.views.generic.edit import CreateView
 from django.apps import apps
 
+from proj_django_resume import settings
 from .models import BasicInfoModel, EducationModel, SkillModel, WorkExperienceModel
+import logging
+
+# 日志配置
+logger = logging.getLogger("django.request")
 
 
 # Create your views here.
-def show(request, user):
-    basic_info = get_object_or_404(BasicInfoModel, user_id=user)
-    edu_infos = get_list_or_404(EducationModel, resume_id=basic_info.id)
+def show(request, username=None):
+
+    basic_info = get_object_or_404(BasicInfoModel, user=User.objects.get(username=username) if username else request.user)
+    edu_infos = get_list_or_404(EducationModel, resume=basic_info)
     edu_infos = sorted(edu_infos, key=lambda x: x.gmt_education_end, reverse=True)
 
-    skill_infos = get_list_or_404(SkillModel, resume_id=basic_info.id)
+    skill_infos = get_list_or_404(SkillModel, resume=basic_info)
     skill_infos = sorted(skill_infos, key=lambda value: value.skill_level, reverse=True)
 
-    work_experiences = get_list_or_404(WorkExperienceModel, resume_id=basic_info.id)
+    work_experiences = get_list_or_404(WorkExperienceModel, resume=basic_info)
     work_experiences = sorted(work_experiences, key=lambda value: value.gmt_duration, reverse=True)
 
     list_bg_color = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary', 'bg-secondary', 'bg-dark']
@@ -46,6 +53,7 @@ class IndexView(View):
     template_name = "resume/index.html"
 
     def get(self, request, *args, **kwargs):
+        logger.info(f"{ request.get_host() }")
         user_obj = request.user
         # 判断用户是否登录
         if not user_obj.is_authenticated:

@@ -10,3 +10,4 @@ img/*.jpg
 resume/migrations/0001_initial.py
 /assets/*
 /static/*
+/media/*

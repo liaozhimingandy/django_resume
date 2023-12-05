@@ -6,21 +6,24 @@ version: '3.7'
 services:
   resume:
     image: *resume-image
-    command: gunicorn proj_django_resume.wsgi:application --workers 3 --bind :8000
+#    for beta
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+     - "8000:8000"
     env_file:
-      - ./config/.env
+      - ./config/.env.local
     environment:
       - TZ=Asia/Shanghai
     volumes:
       - data_static:/opt/app/static
       - data_static:/opt/app/media
-      
+
   web:
     depends_on:
       - resume
     image: *nginx-image
     ports:
-      - 80:80
+      - "80:80"
     environment:
       - TZ=Asia/Shanghai
     volumes:

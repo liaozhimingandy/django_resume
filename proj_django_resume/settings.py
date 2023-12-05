@@ -9,8 +9,12 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import logging
 import os
+import time
 from pathlib import Path
+
+from django import get_version
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,15 +23,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2i)5nlg$j39s0k7x6%_74_o((e297z&235_@@=2xwryuacpdbe'
+SECRET_KEY = os.getenv('AP_SECRET_KEY', 'django-insecure-2i)5nlg$j39s0k7x6%_74_o((e297z&235_@@=2xwryuacpdbe')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get("DEBUG", default=1))
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(" ")
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://*").split(" ")
+DEBUG = int(os.getenv("AP_DEBUG", default=1))
+ALLOWED_HOSTS = os.getenv("AP_DJANGO_ALLOWED_HOSTS", "localhost").split(" ")
+CSRF_TRUSTED_ORIGINS = os.getenv("AP_CSRF_TRUSTED_ORIGINS", "http://*").split(" ")
+
+# 应用版本信息
+VERSION = (1, 0, 1, "alpha", 3)
+__version__ = get_version(VERSION)
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,8 +63,7 @@ ROOT_URLCONF = 'proj_django_resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media'
             ],
         },
     },
@@ -104,24 +111,31 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = 'zh-hans'
-
 TIME_ZONE = 'Asia/Shanghai'
-
 USE_I18N = True
-
 USE_TZ = True
-
+# DATE_FORMAT = "Y-m-d"
+# DATE_INPUT_FORMATS = "Y-m-d"
+# DATETIME_FORMAT = "Y-m-d H:M:S.f"
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images); eg:" static/" or "http://static.example.com/"
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+STATIC_URL = os.getenv('AP_STATIC_URL', 'static/')
+
 # python manage.py collectstatic 收集文件到下面文件文件夹里
-STATIC_ROOT = os.path.join(BASE_DIR, "assets")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+# 用户通过表单上传多媒体存放地址, eg:  "http://media.example.com/",
+# 参考链接: file:///C:/Users/zhiming/Downloads/django-docs-4.2-zh-hans/ref/settings.html#std-setting-MEDIA_URL
+MEDIA_URL = os.getenv('AP_MEDIA_URL', 'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# python manage.py collectstatic 或 findstatic 查找的文件路径
+STATICFILES_DIRS = [
+    ("media", MEDIA_ROOT),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -138,4 +152,98 @@ CKEDITOR_CONFIGS = {
         'width': 'auto',  # 编辑器宽
     },
 }
-CKEDITOR_UPLOAD_PATH = ''  # 上传图片保存路径，留空则调用django的文件上传功能
+CKEDITOR_UPLOAD_PATH = MEDIA_ROOT  # 上传图片保存路径，留空则调用django的文件上传功能
+
+# 日志配置
+BASE_LOG_DIR = os.path.join(BASE_DIR, "logs")
+if not os.path.exists(BASE_LOG_DIR):
+    os.makedirs(BASE_LOG_DIR)
+
+# LOGGING = {
+#     "version": 1,  # 日志版本号
+#     "disable_existing_loggers": False,  # 禁用已存在的logger实例
+#     # 格式化器
+#     "formatters": {
+#         # 详细日志
+#         "verbose": {
+#             "format": "{asctime:<19}|{levelname:<10}|{module:<20}|{lineno:>6}|{message}",
+#             "style": "{",
+#             "datefmt": "%Y-%m-%d %H:%M:%S",
+#         },
+#         # 简单格式
+#         "simple": {
+#             "format": "{asctime:<19}|{lineno:>6}|{message}",
+#             "datefmt": "%Y-%m-%d %H:%M:%S",
+#             "style": "{",
+#         },
+#     },
+#     # 过滤器
+#     "filters": {
+#         # 仅为调试下
+#         "require_debug_true": {
+#             "()": "django.utils.log.RequireDebugTrue",
+#         },
+#         # 在非debug环境下日志
+#         "require_debug_false": {
+#             "()": "django.utils.log.RequireDebugFalse",
+#         },
+#     },
+#     # 处理器
+#     "handlers": {
+#         # 控制台输出
+#         "console": {
+#             "level": logging.DEBUG,
+#             "filters": ["require_debug_true"],
+#             "class": "logging.StreamHandler",
+#             "formatter": "verbose",
+#         },
+#         # 电子邮件发给管理员
+#         "mail_admins": {
+#             "level": logging.ERROR,
+#             "class": "django.utils.log.AdminEmailHandler",
+#             "filters": ["require_debug_true"],
+#         },
+#         # "file": {
+#         #     "level": "INFO",
+#         #     "class": "logging.handlers.RotatingFileHandler",  # 保留到文件，自动分割
+#         #     "filename": os.path.join(BASE_LOG_DIR, 'info.log'),  # 日志文件
+#         #     "maxBytes": 1024 * 1024 * 50,  # 大小为50M
+#         #     "backupCount": 7,  # 保留最近7个文件
+#         #     "formatter": "verbose",
+#         #     "encoding": "utf-8"
+#         # },
+#         #  按照时间记录日志
+#         "time_file": {
+#             "level": logging.INFO,  # 日志级别
+#             "class": "logging.handlers.TimedRotatingFileHandler",  # 处理类
+#             "filename": os.path.join(BASE_LOG_DIR, f"{time.strftime('%Y-%m-%d')}.log"),  # 日志名称
+#             "filters": ["require_debug_false"], # 当生产环境时才保存到文件中
+#             "when": 'D',  # 时间单位： M, H, D， W0(周一), W6(周日)
+#             "interval": 1,
+#             "backupCount": 7,  # 备份数量
+#             "formatter": "verbose",  # 日志格式
+#             "encoding": "utf-8"
+#         },
+#     },
+#     # 日志器
+#     "loggers": {
+#         # INFO级别以上的日志，日志打印到控制台，django为默认的日志器
+#         "django": {
+#             "level": logging.INFO,
+#             "handlers": ["console"],
+#             "propagate": True,
+#         },
+#         # django默认的请求报错是调用该日志记录器
+#         "django.request": {
+#             "handlers": ["console", "time_file"],
+#             "level": logging.INFO,
+#             "propagate": True,  # 是否向更高级别的日志级别传递
+#         },
+#         "Server.web.views": {
+#             "handlers": ["time_file", "console"],
+#             "level": logging.ERROR,
+#             "propagate": True,  # 是否向更高级别的日志级别传递
+#         },
+#
+#     }
+# }
