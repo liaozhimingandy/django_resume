@@ -16,7 +16,7 @@ from django.views.generic.edit import CreateView
 from django.apps import apps
 
 from proj_django_resume import settings
-from .models import BasicInfoModel, EducationModel, SkillModel, WorkExperienceModel
+from .models import BasicInfo, Education, Skill, WorkExperience
 import logging
 
 # 日志配置
@@ -26,15 +26,15 @@ logger = logging.getLogger("django.request")
 # Create your views here.
 def show(request, username=None):
 
-    basic_info = get_object_or_404(BasicInfoModel, user=User.objects.get(username=username) if username else request.user)
-    edu_infos = get_list_or_404(EducationModel, resume=basic_info)
+    basic_info = get_object_or_404(BasicInfo, user=User.objects.get(username=username) if username else request.user)
+    edu_infos = get_list_or_404(Education, resume=basic_info)
     edu_infos = sorted(edu_infos, key=lambda x: x.gmt_education_end, reverse=True)
 
-    skill_infos = get_list_or_404(SkillModel, resume=basic_info)
-    skill_infos = sorted(skill_infos, key=lambda value: value.skill_level, reverse=True)
+    skill_infos = get_list_or_404(Skill, resume=basic_info)
+    skill_infos = sorted(skill_infos, key=lambda value: value.percent, reverse=True)
 
-    work_experiences = get_list_or_404(WorkExperienceModel, resume=basic_info)
-    work_experiences = sorted(work_experiences, key=lambda value: value.gmt_duration, reverse=True)
+    work_experiences = get_list_or_404(WorkExperience, resume=basic_info)
+    work_experiences = sorted(work_experiences, key=lambda value: value.gmt_duration_start, reverse=True)
 
     list_bg_color = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary', 'bg-secondary', 'bg-dark']
     list_badge_color = ['badge-info', 'badge-primary', 'badge-light', 'badge-success', 'badge-danger',
@@ -64,7 +64,7 @@ class IndexView(View):
 
 class BasicInfoUpdate(UpdateView):
     template_name = 'resume/basicinfomodel/update.html'
-    model = BasicInfoModel
+    model = BasicInfo
     # fields = ['name_cn']
     fields = fields_for_model(model=model)
 

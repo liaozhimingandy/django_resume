@@ -7,11 +7,14 @@ from proj_django_resume import settings
 from . import models
 
 
+fields_exclude = ['gmt_modified', 'gmt_created', 'updater', 'creator']
+
+
 # Register your models here.
-@admin.register(models.BasicInfoModel)
+@admin.register(models.BasicInfo)
 class BasicInfoModelAdmin(admin.ModelAdmin):
-    list_display = ['name_cn', 'sex_display', 'contact_phone', 'email']
-    exclude = ['gmt_modified', 'gmt_created', 'operator', 'creator']
+    list_display = ['name_cn', 'sex_display', 'phone', 'email']
+    exclude = fields_exclude
 
     # 搜索
     search_fields = ['name_cn']
@@ -29,22 +32,22 @@ class BasicInfoModelAdmin(admin.ModelAdmin):
     @admin.display(description="性别")
     def sex_display(self, obj):
         """显示枚举值数据"""
-        return models.BasicInfoModel.SexEnum(str(obj.sex)).label
+        return models.BasicInfo.SexEnum(str(obj.sex)).label
 
     def save_model(self, request, obj, form, change):
         """重新保存逻辑"""
-        if not {'name_cn', 'name_en', 'sex', 'contact_phone', 'email', 'expected_position', 'head_sculpture',
-                'self_desc', 'hobby', "user"} & set(form.changed_data):
+        if not {'name_cn', 'name_en', 'sex', 'phone', 'email', 'expected_position', 'avatar', 'evaluation', 'hobby',
+                "user", "href"} & set(form.changed_data):
             message = format_html(f"无需要修改的数据, <a href='{request.path}'>{obj.name_cn}</a>")
             messages.set_level(request, messages.WARNING)
             self.message_user(request, message, messages.WARNING)
             return
-        else:
-            if not change:
-                obj.creator = request.user
-                obj.user = request.user
-            obj.operator = request.user
-            super().save_model(request, obj, form, change)
+
+        if not change:
+            obj.creator = request.user
+            obj.user = request.user
+        obj.updater = request.user
+        super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
         """重新获取数据集逻辑,比如只过来本用户下的数据"""
@@ -58,45 +61,11 @@ class BasicInfoModelAdmin(admin.ModelAdmin):
         return reverse("resume:show-resume", kwargs={"username": obj.user.username})
 
 
-@admin.register(models.SkillModel)
-class SkillAdmin(admin.ModelAdmin):
-    list_display = ['skill', 'skill_level', 'resume']
-    exclude = ['gmt_modified', 'gmt_created', 'operator', 'creator']
-    ordering = ['-skill_level']
-    # 分页 - 设置每页最大显示数目
-    list_per_page = 10
-    view_on_site = False
-
-    def save_model(self, request, obj, form, change):
-        if not {'skill', 'skill_level', 'resume'} & set(form.changed_data):
-            message = format_html(f"无需要修改的数据, <a href='{request.path}'>{obj.skill}</a>")
-            messages.set_level(request, messages.WARNING)
-            self.message_user(request, message, messages.WARNING)
-            return
-        else:
-            if not change:
-                obj.creator = request.user
-            obj.operator = request.user
-            super().save_model(request, obj, form, change)
-
-    def get_queryset(self, request):
-        """重新获取数据集逻辑,比如只过来本用户下的数据"""
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        try:
-            base_info_obj = models.BasicInfoModel.objects.get(user=request.user)
-        except ObjectDoesNotExist:
-            return qs.filter(resume=None)
-        else:
-            return qs.filter(resume=base_info_obj)
-
-
-@admin.register(models.EducationModel)
+@admin.register(models.Education)
 class EducationAdmin(admin.ModelAdmin):
-    list_display = ['edu_unit', 'certificate', 'gmt_education', 'gmt_education_end', 'resume', 'edu_desc_display']
-    exclude = ['gmt_modified', 'gmt_created', 'operator', 'creator']
-    ordering = ['-gmt_education_end']
+    list_display = ['edu_unit', 'certificate', 'gmt_education_start', 'gmt_education_end', 'resume', 'edu_desc_display']
+    exclude = fields_exclude
+    ordering = ['-gmt_education_start', '-gmt_education_end']
 
     @admin.display(description="教育描述")
     def edu_desc_display(self, obj):
@@ -108,11 +77,10 @@ class EducationAdmin(admin.ModelAdmin):
             messages.set_level(request, messages.WARNING)
             self.message_user(request, message, messages.WARNING)
             return
-        else:
-            if not change:
-                obj.creator = request.user
-            obj.operator = request.user
-            super().save_model(request, obj, form, change)
+        if not change:
+            obj.creator = request.user
+        obj.operator = request.user
+        super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
         """重新获取数据集逻辑,比如只过来本用户下的数据"""
@@ -120,18 +88,18 @@ class EducationAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         try:
-            base_info_obj = models.BasicInfoModel.objects.get(user=request.user)
+            base_info_obj = models.BasicInfo.objects.get(user=request.user)
         except ObjectDoesNotExist:
             return qs.filter(resume=None)
         else:
             return qs.filter(resume=base_info_obj)
 
 
-@admin.register(models.WorkExperienceModel)
+@admin.register(models.WorkExperience)
 class WorkExperienceAdmin(admin.ModelAdmin):
-    list_display = ['company', 'gmt_duration', 'gmt_duration_end', 'work_position', 'work_desc_display', 'resume']
-    exclude = ['gmt_modified', 'gmt_created', 'operator', 'creator']
-    ordering = ['-gmt_duration']
+    list_display = ['company', 'gmt_duration_start', 'gmt_duration_end', 'work_position', 'work_desc_display', 'resume']
+    exclude = fields_exclude
+    ordering = ['-gmt_duration_start']
 
     @admin.display(description="工作内容")
     def work_desc_display(self, obj):
@@ -143,11 +111,11 @@ class WorkExperienceAdmin(admin.ModelAdmin):
             messages.set_level(request, messages.WARNING)
             self.message_user(request, message, messages.WARNING)
             return
-        else:
-            if not change:
-                obj.creator = request.user
-            obj.operator = request.user
-            super().save_model(request, obj, form, change)
+
+        if not change:
+            obj.creator = request.user
+        obj.operator = request.user
+        super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
         """重新获取数据集逻辑,比如只过来本用户下的数据"""
@@ -155,11 +123,51 @@ class WorkExperienceAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         try:
-            base_info_obj = models.BasicInfoModel.objects.get(user=request.user)
+            base_info_obj = models.BasicInfo.objects.get(user=request.user)
         except ObjectDoesNotExist:
             return qs.filter(resume=None)
         else:
             return qs.filter(resume=base_info_obj)
+
+
+@admin.register(models.Skill)
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ["id", 'skill', 'percent']
+    exclude = fields_exclude
+    ordering = ['-percent']
+    list_editable = ['skill', 'percent']
+    # 分页 - 设置每页最大显示数目
+    list_per_page = 10
+    view_on_site = False
+
+    def save_model(self, request, obj, form, change):
+        if not {'skill', 'percent', 'resume'} & set(form.changed_data):
+            message = format_html(f"无需要修改的数据, <a href='{request.path}'>{obj.skill}</a>")
+            messages.set_level(request, messages.WARNING)
+            self.message_user(request, message, messages.WARNING)
+            return
+
+        if not change:
+            obj.creator = request.user
+        obj.operator = request.user
+        super().save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        """重新获取数据集逻辑,比如只过来本用户下的数据"""
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        try:
+            base_info_obj = models.BasicInfo.objects.get(user=request.user)
+        except ObjectDoesNotExist:
+            return qs.filter(resume=None)
+        else:
+            return qs.filter(resume=base_info_obj)
+
+    # def get_list_display(self, request):
+    #     list_display_fields = [field.name for field in self.model._meta.fields]
+    #     return list(set(list_display_fields)-set(fields_exclude))
+
 
 
 # 管理后台抬头和标题显示调整; 参考链接: file:///C:/Users/zhiming/Downloads/django-docs-4.2-zh-hans/ref/contrib/admin/index.html#django
