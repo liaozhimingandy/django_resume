@@ -56,7 +56,7 @@
                                 <h5>
                                     <small><span class="icon-github-sign m-1"></span>
                                         <a href="{{ basic_info.href }}" class="text-muted"
-                                           target="_blank">{{ basic_info.href|cut:"https://github.com/" }}</a>
+                                           target="_blank">{{ basic_info.href|cut:"https://github.com/"|default_if_none:"#" }}</a>
                                     </small>
                                 </h5>
                             </div>
@@ -94,7 +94,7 @@
                                 <div class="col-12">
                                     <B class="font-weight-bold">{{ work_experience.work_position }}
                                         {% if forloop.first %}
-                                        <span class="badge badge-primary">Now</span>
+                                        <span class="badge badge-primary">目前</span>
                                         {% endif %}
                                     </B>
                                 </div>
@@ -107,8 +107,8 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="col-12 col-lg-8 text-right">{{ work_experience.company }}<span
-                                    class="badge badge-primary">No{{ forloop.revcounter }}</span></div>
+                            <div class="col-12 col-lg-8 text-right"><B>{{ work_experience.company|strip }}<span
+                                    class="badge badge-primary">#{{ forloop.revcounter }}</span></B></div>
                         </div>
                         <!--工作内容描述-->
                         <div class="col-12 text-muted">
@@ -121,7 +121,7 @@
                             </B>
                             <div>
                                 {% for skill in work_experience.used_tech|value_split %}
-                                <span class="badge {{ list_bg_color|random }}">{{ skill }}</span>
+                                <span class="badge {{ list_bg_color|random }}">{{ skill|capfirst|strip }}</span>
                                 {% endfor %}
                             </div>
                         </div>
@@ -143,7 +143,7 @@
                     <B>主要技能</B>
                     {% for skill_info in skill_infos %}
                     {% if forloop.counter <= 5 %}
-                    <div>{{ skill_info.skill }}
+                    <div>{{ skill_info.skill|capfirst|strip }}
                         <div class="progress">
                             <div class="progress-bar progress-bar-striped progress-bar-animated {{ list_bg_color|random }}"
                                  role="progressbar"
@@ -156,12 +156,12 @@
                     {% elif forloop.counter == 6 %}
                     <B>其它</B>
                     <div>
-                        <span class="badge badge-pill {{ list_badge_color|random }} btn-lg">{{ skill_info.skill }}</span>
+                        <span class="badge badge-pill {{ list_badge_color|random }} btn-lg">{{ skill_info.skill|strip }}</span>
                         {% elif forloop.last %}
-                        <span class="badge badge-pill {{ list_badge_color|random }} btn-lg">{{ skill_info.skill }}</span>
+                        <span class="badge badge-pill {{ list_badge_color|random }} btn-lg">{{ skill_info.skill|strip }}</span>
                     </div>
                     {% else %}
-                    <span class="badge badge-pill {{ list_badge_color|random }} btn-lg">{{ skill_info.skill }}</span>
+                    <span class="badge badge-pill {{ list_badge_color|random }} btn-lg">{{ skill_info.skill|strip }}</span>
                     {% endif%}
                     {% endfor %}
                 </div>

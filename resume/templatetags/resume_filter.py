@@ -22,4 +22,10 @@ def value_split(value, separator=','):
     return value.split(separator)
 
 
+@register.filter(name="strip")
+def strip(value):
+    assert isinstance(value, (str,))
+    return value.strip()
+
+
 

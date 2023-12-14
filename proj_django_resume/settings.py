@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import datetime
 import logging
 import os
 import time
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # django自带简单页面功能使用,文档链接: file:///C:/Users/zhiming/Downloads/django-docs-5.0-zh-hans/ref/contrib/flatpages.html
+    'django.contrib.sites',
+    'django.contrib.flatpages',
 
     'ckeditor',  # 富文本编辑器
 
@@ -56,6 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
 ROOT_URLCONF = 'proj_django_resume.urls'
@@ -63,7 +69,7 @@ ROOT_URLCONF = 'proj_django_resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS':  [BASE_DIR / 'templates', ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -247,3 +253,5 @@ if not os.path.exists(BASE_LOG_DIR):
 #
 #     }
 # }
+# 网站ID
+SITE_ID = os.getenv("A_SITE_ID", 2023)

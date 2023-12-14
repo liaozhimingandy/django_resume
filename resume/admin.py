@@ -1,11 +1,14 @@
+from ckeditor.fields import RichTextField
+from ckeditor.widgets import CKEditorWidget
 from django.contrib import admin, messages
+from django.contrib.flatpages.admin import FlatPageAdmin
+from django.contrib.flatpages.models import FlatPage
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.utils.html import format_html
 
 from proj_django_resume import settings
 from . import models
-
 
 fields_exclude = ['gmt_modified', 'gmt_created', 'updater', 'creator']
 
@@ -72,7 +75,7 @@ class EducationAdmin(admin.ModelAdmin):
         return format_html(obj.edu_desc)
 
     def save_model(self, request, obj, form, change):
-        if not {'edu_unit', 'certificate', 'resume', 'gmt_education', 'gmt_education_end'} & set(form.changed_data):
+        if not {'edu_unit', 'certificate', 'resume', 'gmt_education', 'gmt_education_end', 'edu_desc'} & set(form.changed_data):
             message = format_html(f"无需要修改的数据, <a href='{request.path}'>{obj.edu_unit}</a>")
             messages.set_level(request, messages.WARNING)
             self.message_user(request, message, messages.WARNING)
@@ -106,7 +109,8 @@ class WorkExperienceAdmin(admin.ModelAdmin):
         return format_html(obj.work_desc)
 
     def save_model(self, request, obj, form, change):
-        if not {'company', 'gmt_duration', 'gmt_duration_end', 'work_position', 'work_desc', 'resume', 'used_tech'} & set(form.changed_data):
+        if not {'company', 'gmt_duration', 'gmt_duration_end', 'work_position', 'work_desc', 'resume',
+                'used_tech'} & set(form.changed_data):
             message = format_html(f"无需要修改的数据, <a href='{request.path}'>{obj.company}</a>")
             messages.set_level(request, messages.WARNING)
             self.message_user(request, message, messages.WARNING)
@@ -168,6 +172,33 @@ class SkillAdmin(admin.ModelAdmin):
     #     list_display_fields = [field.name for field in self.model._meta.fields]
     #     return list(set(list_display_fields)-set(fields_exclude))
 
+
+# 重新注册flatpage
+admin.site.unregister(FlatPage)
+
+
+@admin.register(FlatPage)
+# 重新定义简单页面管理器
+class FlatPageAdmin(FlatPageAdmin):
+    fieldsets = [
+        ("基本信息", {"fields": ["url", "title", "content", "sites"]}),
+        (
+            "高级管理",
+            {
+                "classes": ["collapse"],
+                "fields": [
+                    "enable_comments",
+                    "registration_required",
+                    "template_name",
+                ],
+            },
+        ),
+    ]
+    # 覆盖原字段的组件
+    formfield_overrides = {
+        models.models.TextField: {"widget": CKEditorWidget},
+    }
+    filter_horizontal = ["sites", ]
 
 
 # 管理后台抬头和标题显示调整; 参考链接: file:///C:/Users/zhiming/Downloads/django-docs-4.2-zh-hans/ref/contrib/admin/index.html#django

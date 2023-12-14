@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.flatpages import views
 from django.urls import path, re_path, include
 
 from django.views.generic import TemplateView
@@ -25,7 +26,10 @@ urlpatterns = [
     re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
     path('resume/', include('resume.urls')),
     path('', TemplateView.as_view(template_name="resume/home.html")),
+    re_path(r"^(?P<url>.*/)$", views.flatpage),  # django自带简单页面功能
+    # path("pages/", include("django.contrib.flatpages.urls")),
 ]
+
 # 若为开发环境,则使用内置static目录
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
