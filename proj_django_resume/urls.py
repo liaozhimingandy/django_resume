@@ -18,14 +18,16 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.flatpages import views
 from django.urls import path, re_path, include
+from django.views.decorators.cache import cache_page
 
 from django.views.generic import TemplateView
+import resumes
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
-    path('resume/', include('resume.urls')),
-    path('', TemplateView.as_view(template_name="resume/home.html")),
+    path('resumes/', include('resumes.urls')),
+    path('', cache_page(60*2)(TemplateView.as_view(template_name="resumes/home.html"))),
     re_path(r"^(?P<url>.*/)$", views.flatpage),  # django自带简单页面功能
     # path("pages/", include("django.contrib.flatpages.urls")),
 ]

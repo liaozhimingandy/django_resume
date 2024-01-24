@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import datetime
 import logging
 import os
+import subprocess
 import time
 from pathlib import Path
 
@@ -32,8 +33,11 @@ ALLOWED_HOSTS = os.getenv("AP_DJANGO_ALLOWED_HOSTS", "localhost").split(" ")
 CSRF_TRUSTED_ORIGINS = os.getenv("AP_CSRF_TRUSTED_ORIGINS", "http://*").split(" ")
 
 # 应用版本信息
-VERSION = (1, 0, 1, "alpha", 3)
+VERSION = (1, 0, 1, "alpha", 0)
 __version__ = get_version(VERSION)
+APP_COMMIT_HASH = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip().decode('UTF8')
+APP_BRANCH = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip().decode('UTF8')
+APP_VERSION_VERBOSE = f"{APP_BRANCH}|{APP_COMMIT_HASH}"
 
 # Application definition
 INSTALLED_APPS = [
@@ -49,10 +53,11 @@ INSTALLED_APPS = [
 
     'ckeditor',  # 富文本编辑器
 
-    'resume',  # 自定义app
+    'resumes',  # 自定义app
 ]
 
 MIDDLEWARE = [
+    "django.middleware.cache.UpdateCacheMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,6 +67,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = 'proj_django_resume.urls'
@@ -69,7 +75,7 @@ ROOT_URLCONF = 'proj_django_resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS':  [BASE_DIR / 'templates', ],
+        'DIRS': [BASE_DIR / 'templates', ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -255,3 +261,23 @@ if not os.path.exists(BASE_LOG_DIR):
 # }
 # 网站ID
 SITE_ID = os.getenv("A_SITE_ID", 2023)
+
+# 缓存配置
+CACHE_MIDDLEWARE_SECONDS = 60 * 5
+CACHE_MIDDLEWARE_KEY_PREFIX = "AP"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": "d:/tmp/django_cache",
+        "TIMEOUT": 60,
+        "VERSION": 2,
+        "KEY_PREFIX": "alsoapp",
+        "KEY_FUNCTION": "proj_django_resume.settings.make_key"
+
+    }
+}
+
+
+def make_key(key, key_prefix, version):
+    return "-".join([key_prefix, str(version), key])

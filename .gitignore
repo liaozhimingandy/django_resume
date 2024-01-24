@@ -3,11 +3,11 @@ venv/*
 .idea/*
 *.spec
 proj_django_resume/resume/migrations/*
-resume/migrations/*
+resumes/migrations/*
 proj_django_resume/img/*.jpg
 *.sqlite3
 img/*.jpg
-resume/migrations/0001_initial.py
+resumes/migrations/0001_initial.py
 /assets/*
 /static/*
 /media/*

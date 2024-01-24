@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN" class="no-js">
+<head>
+
+    <!-- Meta tags -->
+    {% block site_meta %}
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+        <!-- Page description -->
+        <meta name="description" content="#"/>
+
+        <!-- Page author -->
+        <meta name="author" content=""/>
+
+        <!-- Favicon -->
+        <link rel="icon" href="#"/>
+
+    {% endblock %}
+
+    <!-- Site title -->
+    {% block htmltitle %}
+    {% endblock %}
+
+    <!-- Theme-related style sheets -->
+    {% block styles %}
+        <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css"/>
+    {% endblock %}
+
+    <!-- JavaScript libraries -->
+    {% block libs %}{% endblock %}
+
+    <!-- Webfonts -->
+    {% block fonts %}{% endblock %}
+
+    <!-- Custom style sheets -->
+    {% block extrastyle %}{% endblock %}
+
+    <!-- Custom front matter -->
+    {% block extrahead %}{% endblock %}
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+    <style>
+        body {
+            font-size: .875rem;
+        }
+
+        .feather {
+            width: 16px;
+            height: 16px;
+        }
+
+        /*
+         * Sidebar
+         */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            /* rtl:raw:
+            right: 0;
+            */
+            bottom: 0;
+            /* rtl:remove */
+            left: 0;
+            z-index: 100; /* Behind the navbar */
+            padding: 48px 0 0; /* Height of navbar */
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+
+        @media (max-width: 767.98px) {
+            .sidebar {
+                top: 5rem;
+            }
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        }
+
+        .sidebar .nav-link {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .sidebar .nav-link .feather {
+            margin-right: 4px;
+            color: #727272;
+        }
+
+        .sidebar .nav-link.active {
+            color: #2470dc;
+        }
+
+        .sidebar .nav-link:hover .feather,
+        .sidebar .nav-link.active .feather {
+            color: inherit;
+        }
+
+        .sidebar-heading {
+            font-size: .75rem;
+        }
+
+        /*
+         * Navbar
+         */
+
+        .navbar-brand {
+            padding-top: .75rem;
+            padding-bottom: .75rem;
+            background-color: rgba(0, 0, 0, .25);
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+        }
+
+        .navbar .navbar-toggler {
+            top: .25rem;
+            right: 1rem;
+        }
+
+        .navbar .form-control {
+            padding: .75rem 1rem;
+        }
+
+        .form-control-dark {
+            color: #fff;
+            background-color: rgba(255, 255, 255, .1);
+            border-color: rgba(255, 255, 255, .1);
+        }
+
+        .form-control-dark:focus {
+            border-color: transparent;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+        }
+
+    </style>
+</head>
+
+<body>
+<!-- Announcement bar -->
+{% block announce %}{% endblock %}
+
+<!-- Header -->
+{% block header %}{% endblock %}
+
+<!-- Container -->
+<div>
+    <!-- header  -->
+    {% block tabs %}
+        {% include 'resumes/partials/header.html' %}
+    {% endblock %}
+
+    <!-- Main area -->
+    <div class="container-fluid" data-md-component="main">
+        <div class="row">
+            <!-- Navigation -->
+            <nav id="sidebarMenu" class="sidebar col-md-3 col-lg-2 d-md-block bg-light collapse">
+                {% block site_nav %}
+                    {% include 'resumes/partials/nav.html' %}
+                {% endblock %}
+                <!-- Footer -->
+                {% block footer %}
+                    {% include 'resumes/partials/footer.html' %}
+                {% endblock %}
+            </nav>
+            <!-- Page content -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-0">
+                <iframe id="icontent" name="menuFrame" src="" style="overflow: visible;"
+                        scrolling="yes" frameborder="no" width="100%">
+                </iframe>
+            </div>
+        </div>
+        <!-- Back-to-top button -->
+        {% if "navigation.top" in features %}
+            <a
+                    href="#"
+                    class="md-top md-icon"
+                    data-md-component="top"
+                    data-md-state="hidden"
+            >
+                向上
+            </a>
+        {% endif %}
+
+</div>
+
+<!-- Theme-related JavaScript -->
+{% block scripts %}
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.min.js"></script>
+{% endblock %}
+</div>
+    <script>
+        /*
+               * 对选中的标签**active状态，对先前处于active状态但之后未被选中的标签取消active
+               * （实现左侧菜单中的标签点击后变色的效果）
+               */
+        $(document).ready(function () {
+            $('.menu-nav-item > a').click(function (e) {
+                //e.preventDefault();    加上这句则导航的<a>标签会失效
+                $('.nav-item > a').removeClass('active');
+                $(this).addClass('active');
+
+                const address = $(this).attr("data-src");
+                $("#icontent").attr("src", address);
+                $('#icontent').fadeIn("30000");
+                {#const result = $('#icontent').prop('contentWindow').document;#}
+                {#console.log(result);#}
+                {#console.log(result.body.scrollHeight);#}
+                {#$('#icontent').attr("height", result.body.scrollHeight)#}
+
+
+            });
+
+            $(window).resize(function () {
+
+                var a = $(window).height();//窗口高度
+                var b = a - $("header").height()-6;//窗口高度减去导航栏，这个按照实际情况来。
+                var c = $(window).width();//窗口宽度
+                $("#icontent").height(b);//外层div的高宽。
+
+            });
+
+            $(window).resize();//随着窗口的变动而变动
+
+        });
+    </script>
+<!-- Custom JavaScript -->
+{% block customscripts %}{% endblock %}
+</body>
+</html>

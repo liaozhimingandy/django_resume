@@ -1,0 +1,50 @@
+{% extends 'resumes/base/base.html' %}
+{#{% load app_extras static %}#}
+{% block extra-css %}
+{% endblock extra-css %}
+{% block title %}详情 {{meta.title}}{% endblock %}
+{% block content-header %}<h1>{{meta.verbose_name}} <small> {{obj}} 详情</small></h1>{% endblock %}
+{% block main-content %}
+<div class="box box-{%if object.actived%}success{%else%}danger{%endif%}">
+  <form method="post" action="{%url 'resumes:index' %}">
+    {% csrf_token %}
+    <input type="hidden" name="index" value="{{obj.pk}}">
+    <div class="box-header with-border">
+      <h3 class="box-title">
+        {{obj.name_cn}}
+      </h3>
+      <div class="box-tools pull-right no-print hidden-xs">
+        {%block box-tools-extra%}
+        {%endblock box-tools-extra%}
+
+        <div class="btn-group">
+          <a class="btn btn-default btn-sm" title="编辑 {{object}}" href="{%url 'resumes:update' model obj.id%}">
+            <i class="fa fa-edit"></i><span> 编辑</span>
+          </a>
+          <button type="button" class="btn btn-default btn-sm" onclick="window.history.go(-1)">
+            <i class="fa fa-arrow-circle-o-left"></i><span> 返回</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="box-body">
+    <table class="table table-bordered table-condensed nowarp">
+      <tbody>{{obj_as_table}}</tbody>
+    </table>
+
+  {% block page-extra %}
+  {% endblock %}
+  </div>
+</div>
+{% endblock %}
+{% block extra-js %}
+<script>
+  $(document).ready(function() {
+    $('body').on('hidden.bs.modal', '.modal', function () {
+        $(this).removeData('bs.modal');
+    });
+  });
+</script>
+{% endblock %}
