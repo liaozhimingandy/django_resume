@@ -2,20 +2,23 @@ from collections import OrderedDict
 from itertools import chain
 
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.db import models
 from django.contrib.admin.utils import label_for_field, display_for_field
 from django.forms import fields_for_model
+from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views import View
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page, never_cache
 from django.views.generic import UpdateView, DetailView, ListView
 from django.views.generic.edit import CreateView
 from django.apps import apps
 
+from proj_django_resume import settings
 from .models import BasicInfo, Education, Skill, WorkExperience
 import logging
 
@@ -23,26 +26,35 @@ import logging
 logger = logging.getLogger("django.request")
 
 
+@never_cache
 # Create your views here.
 def show(request, username=None):
+
+    site = Site.objects.get(domain=request.get_host().split(':')[0])
     basic_info = get_object_or_404(BasicInfo, user=User.objects.get(username=username) if username else request.user)
-    edu_infos = get_list_or_404(Education, resume=basic_info)
+    # edu_infos = get_list_or_404(Education, resume=basic_info)
+    edu_infos = basic_info.education_set.all()
     edu_infos = sorted(edu_infos, key=lambda x: x.gmt_education_end, reverse=True)
 
-    skill_infos = get_list_or_404(Skill, resume=basic_info)
+    # skill_infos = get_list_or_404(Skill, resume=basic_info)
+    skill_infos = basic_info.skill_set.all()
     skill_infos = sorted(skill_infos, key=lambda value: value.percent, reverse=True)
 
-    work_experiences = get_list_or_404(WorkExperience, resume=basic_info)
+    # work_experiences = get_list_or_404(WorkExperience, resume=basic_info)
+    work_experiences = basic_info.workexperience_set.all()
     work_experiences = sorted(work_experiences, key=lambda value: value.gmt_duration_start, reverse=True)
 
+    projects = basic_info.project_set.all()
+
     list_bg_color = ['bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-primary', 'bg-secondary', 'bg-dark']
-    list_badge_color = ['badge-info', 'badge-primary', 'badge-light', 'badge-success', 'badge-danger',
-                        'badge-secondary', 'badge-warning', 'badge-dark']
+    list_badge_color = ['text-bg-primary', 'text-bg-light', 'text-bg-success', 'text-bg-danger',
+                        'text-bg-secondary', 'text-bg-warning', 'text-bg-dark', 'text-bg-info']
 
     return render(request, 'resumes/resume.html',
                   context={'basic_info': basic_info, 'edu_infos': edu_infos,
                            'skill_infos': skill_infos, 'list_bg_color': list_bg_color,
-                           'list_badge_color': list_badge_color, 'work_experiences': work_experiences})
+                           'list_badge_color': list_badge_color, 'work_experiences': work_experiences,
+                           'domain': 'alsoapp.com' if site.domain == 'localhost' else site.domain, 'projects': projects, 'version': settings.__version__})
 
 
 class IndexView(View):
@@ -54,6 +66,7 @@ class IndexView(View):
     def get(self, request, *args, **kwargs):
         logger.info(f"{request.get_host()}")
         user_obj = request.user
+
         # 判断用户是否登录
         if not user_obj.is_authenticated:
             return redirect(reverse("account:login"))
@@ -413,5 +426,9 @@ class NewModelView(CreateView):
     def get_success_url(self):
         tpl_name = f"/resumes/"
         return tpl_name
+
+
+async def test_async(request):
+    return JsonResponse({"message": "异步函数"})
 
 

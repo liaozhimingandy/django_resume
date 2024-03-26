@@ -3,6 +3,7 @@ import os.path
 import re
 from functools import cached_property
 
+from django.contrib.sites.models import Site
 from django.db import models
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
@@ -53,13 +54,13 @@ class BasicInfo(CommonModel):
     name_en = models.CharField('英文名称', max_length=64, default='', help_text='您的英文名字(可不填)')
     sex = models.CharField('性别', max_length=2, choices=SexEnum.choices, help_text='性别')
     expected_position = models.CharField('期望岗位', max_length=64, help_text='您的期望岗位')
-    phone = models.CharField('您的手机号码', max_length=64, null=True, help_text="为了方便联系到您",
-                             validators=[validate_phone, ])
+    phone = models.CharField('您的手机号码', max_length=64, null=True, help_text="为了方便联系到您")
     avatar = models.ImageField('您的头像', null=True, upload_to='images/%Y')
     email = models.EmailField('电子邮箱', max_length=256, help_text='您的电子邮箱')
     evaluation = RichTextField('自我描述', default='', help_text='填写你对自己的评价')
     hobby = RichTextField('兴趣爱好', default='', help_text='填写你感兴趣的方面')
     href = models.URLField("你的github地址", null=True, blank=True, default="", help_text="github地址")
+    site = models.ForeignKey(Site, default=settings.SITE_ID, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.name_cn}({self.user.username})"
@@ -118,7 +119,8 @@ class WorkExperience(CommonModel):
     gmt_duration_end = models.DateField('工作结束时间', help_text='工作结束时间', null=True, blank=True)
     work_position = models.CharField('工作岗位', max_length=64, help_text='工作岗位')
     work_desc = RichTextField('工作内容', help_text='工作内容描述')
-    used_tech = models.TextField('使用到的技术', max_length=255, help_text='工作中使用到的技术,多个技术时,请使用逗号,进行分开')
+    used_tech = models.TextField('使用到的技术', max_length=255,
+                                 help_text='工作中使用到的技术,多个技术时,请使用逗号,进行分开')
 
     class Meta:
         verbose_name = "工作经验信息"
@@ -142,3 +144,13 @@ class Skill(CommonModel):
 
     def __str__(self):
         return self.skill
+
+
+class Project(CommonModel):
+    name = models.CharField("项目名称", max_length=16, help_text="项目名称")
+    link = models.URLField("项目链接", help_text="项目链接")
+    resumes = models.ForeignKey(BasicInfo, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "项目信息"
+        verbose_name_plural = verbose_name

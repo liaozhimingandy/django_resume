@@ -17,6 +17,7 @@ import time
 from pathlib import Path
 
 from django import get_version
+from django.utils.html import format_html
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,19 +26,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('AP_SECRET_KEY', 'django-insecure-2i)5nlg$j39s0k7x6%_74_o((e297z&235_@@=2xwryuacpdbe')
+SECRET_KEY = os.getenv('APP_SECRET_KEY', 'django-insecure-2i)5nlg$j39s0k7x6%_74_o((e297z&235_@@=2xwryuacpdbe')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.getenv("AP_DEBUG", default=1))
-ALLOWED_HOSTS = os.getenv("AP_DJANGO_ALLOWED_HOSTS", "localhost").split(" ")
-CSRF_TRUSTED_ORIGINS = os.getenv("AP_CSRF_TRUSTED_ORIGINS", "http://*").split(" ")
+DEBUG = int(os.getenv("APP_DEBUG", default=1))
+ALLOWED_HOSTS = os.getenv("APP_DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("APP_CSRF_TRUSTED_ORIGINS", "https://*").split(",")
 
 # 应用版本信息
-VERSION = (1, 0, 1, "alpha", 0)
+VERSION = (5, 0, 0, 'alpha', 1)
 __version__ = get_version(VERSION)
-APP_COMMIT_HASH = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip().decode('UTF8')
-APP_BRANCH = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip().decode('UTF8')
-APP_VERSION_VERBOSE = f"{APP_BRANCH}|{APP_COMMIT_HASH}"
+print(__version__)
+with open(os.path.join(BASE_DIR, 'AppVersionHash.txt'), mode="r") as fp:
+    APP_COMMIT_HASH = fp.readline()
 
 # Application definition
 INSTALLED_APPS = [
@@ -50,9 +51,7 @@ INSTALLED_APPS = [
     # django自带简单页面功能使用,文档链接: file:///C:/Users/zhiming/Downloads/django-docs-5.0-zh-hans/ref/contrib/flatpages.html
     'django.contrib.sites',
     'django.contrib.flatpages',
-
     'ckeditor',  # 富文本编辑器
-
     'resumes',  # 自定义app
 ]
 
@@ -60,12 +59,12 @@ MIDDLEWARE = [
     "django.middleware.cache.UpdateCacheMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     "django.middleware.cache.FetchFromCacheMiddleware",
 ]
@@ -75,7 +74,7 @@ ROOT_URLCONF = 'proj_django_resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates', ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -134,14 +133,14 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # Static files (CSS, JavaScript, Images); eg:" static/" or "http://static.example.com/"
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = os.getenv('AP_STATIC_URL', 'static/')
+STATIC_URL = os.getenv('APP_STATIC_URL', 'static/')
 
 # python manage.py collectstatic 收集文件到下面文件文件夹里
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # 用户通过表单上传多媒体存放地址, eg:  "http://media.example.com/",
 # 参考链接: file:///C:/Users/zhiming/Downloads/django-docs-4.2-zh-hans/ref/settings.html#std-setting-MEDIA_URL
-MEDIA_URL = os.getenv('AP_MEDIA_URL', 'media/')
+MEDIA_URL = os.getenv('APP_MEDIA_URL', 'media/')
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # python manage.py collectstatic 或 findstatic 查找的文件路径
@@ -259,12 +258,11 @@ if not os.path.exists(BASE_LOG_DIR):
 #
 #     }
 # }
-# 网站ID
-SITE_ID = os.getenv("A_SITE_ID", 2023)
+
 
 # 缓存配置
 CACHE_MIDDLEWARE_SECONDS = 60 * 5
-CACHE_MIDDLEWARE_KEY_PREFIX = "AP"
+CACHE_MIDDLEWARE_KEY_PREFIX = "APP"
 
 CACHES = {
     "default": {
@@ -278,6 +276,7 @@ CACHES = {
     }
 }
 
+SITE_ID = os.getenv('APP_SITE_ID', 2023)
 
 def make_key(key, key_prefix, version):
     return "-".join([key_prefix, str(version), key])

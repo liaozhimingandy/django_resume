@@ -20,7 +20,7 @@ services:
       - resume
     image: *nginx-image
     ports:
-      - 80:80
+      - "80:80"
     environment:
       - TZ=Asia/Shanghai
     volumes:

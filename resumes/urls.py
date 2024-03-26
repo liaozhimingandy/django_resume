@@ -13,13 +13,14 @@
 #   @Description : app内部url
 #
 # ======================================================================
-from django.urls import path, re_path
+from django.urls import re_path
 
-from .views import show, IndexView, BasicInfoUpdate, DetailModelView, ListModelView, UpdateModelView, NewModelView
+from .views import show, test_async
 
 app_name = 'resumes'
 
 urlpatterns = [
+    re_path(r'^test_async/$', test_async, name="test_async"),
     re_path(r'^(?P<username>\w+)/$', show, name='show-resumes'),
     # re_path('^$', IndexView.as_view(), name='index'),
     # path('basicinfo/<int:pk>/update', BasicInfoUpdate.as_view(), name='basicinfo-update'),

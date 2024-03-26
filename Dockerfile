@@ -19,7 +19,6 @@ COPY . /opt/app
 RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ -r /opt/app/requirements.txt || \
     pip install -r /opt/app/requirements.txt
 
-RUN ["chmod", "+x", "/opt/app/config/entrypoint.sh"]
 
 # run entrypoint.sh
-ENTRYPOINT ["/opt/app/config/entrypoint.sh"]
+CMD ["gunicorn", "proj_django_resume.wsgi:application"]
