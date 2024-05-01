@@ -34,9 +34,9 @@ ALLOWED_HOSTS = os.getenv("APP_DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").spl
 CSRF_TRUSTED_ORIGINS = os.getenv("APP_CSRF_TRUSTED_ORIGINS", "https://*").split(",")
 
 # 应用版本信息
-VERSION = (5, 0, 0, 'alpha', 1)
+VERSION = (24, 4, 1, 'alpha', 1)
 __version__ = get_version(VERSION)
-print(__version__)
+
 with open(os.path.join(BASE_DIR, 'AppVersionHash.txt'), mode="r") as fp:
     APP_COMMIT_HASH = fp.readline()
 
