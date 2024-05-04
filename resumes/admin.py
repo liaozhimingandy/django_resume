@@ -207,7 +207,6 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 # 管理后台抬头和标题显示调整; 参考链接: file:///C:/Users/zhiming/Downloads/django-docs-4.2-zh-hans/ref/contrib/admin/index.html#django
-# .contrib.admin.AdminSite
 admin.site.site_header = format_html(f'后台管理(<B{settings.APP_COMMIT_HASH}</B>)')
 admin.site.site_title = '网站管理'
 # admin.site.index_title = 'app管理'
