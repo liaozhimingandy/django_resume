@@ -5,7 +5,7 @@
 #   Copyright (C) 2022 liaozhimingandy@qq.com Ltd. All Rights Reserved.
 #
 #   @Author      : zhiming
-#   @Project     : proj_django_resume
+#   @Project     : django_resume
 #   @File Name   : urls.py
 #   @Created Date: 2022-06-23 22:47
 #      @Software : PyCharm

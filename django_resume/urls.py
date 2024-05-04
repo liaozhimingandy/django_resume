@@ -1,4 +1,4 @@
-"""proj_django_resume URL Configuration
+"""django_resume URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -25,11 +25,10 @@ import resumes
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
+    path("ckeditor5/", include('django_ckeditor_5.urls'), name="ck_editor_5_upload_file"),
     path('resumes/', include('resumes.urls')),
-    path('', cache_page(60*2)(TemplateView.as_view(template_name="resumes/home.html"))),
+    path('', cache_page(60 * 2)(TemplateView.as_view(template_name="resumes/home.html"))),
     re_path(r"^(?P<url>.*/)$", views.flatpage),  # django自带简单页面功能
-    # path("pages/", include("django.contrib.flatpages.urls")),
 ]
 
 # 若为开发环境,则使用内置static目录

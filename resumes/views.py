@@ -18,7 +18,7 @@ from django.views.generic import UpdateView, DetailView, ListView
 from django.views.generic.edit import CreateView
 from django.apps import apps
 
-from proj_django_resume import settings
+from django.conf import settings
 from .models import BasicInfo, Education, Skill, WorkExperience
 import logging
 
@@ -54,7 +54,7 @@ def show(request, username=None):
                   context={'basic_info': basic_info, 'edu_infos': edu_infos,
                            'skill_infos': skill_infos, 'list_bg_color': list_bg_color,
                            'list_badge_color': list_badge_color, 'work_experiences': work_experiences,
-                           'domain': 'alsoapp.com' if site.domain == 'localhost' else site.domain, 'projects': projects, 'version': settings.__version__})
+                           'domain': 'alsoapp.com' if site.domain == 'localhost' else site.domain, 'projects': projects, 'version': settings.APP_COMMIT_HASH})
 
 
 class IndexView(View):

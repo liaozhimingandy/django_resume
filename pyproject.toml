@@ -1,0 +1,23 @@
+[project]
+name = "django_resume"
+version = "0.1.0"
+description = "resume"
+authors = [
+    {name = "liaozhiming", email = "liaozhimingandy@qq.com"},
+]
+dependencies = [
+    "django>=5.0.4",
+    "Pillow>=10.3.0",
+    "django-ckeditor-5>=0.2.12",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.pdm]
+distribution = true

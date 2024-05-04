@@ -11,8 +11,7 @@
         <link rel="stylesheet" href="{% static 'resumes/libs/animate.css/3.7.2/animate.min.css' %}">
         <link rel="stylesheet" href="{% static 'resumes/libs/bootstrap/5.3.1/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'resumes/libs/font-awesome/3.2.1/font-awesome.min.css' %}">
-{#        <link href="https://cdn.bootcss.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">#}
-
+        <link href="https://cdn.bootcss.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
         <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://www.alsoapp.com/favicon.svg">
         <style rel="stylesheet">
             body {
@@ -206,7 +205,7 @@
     <!--页脚-->
     <div class="footer text-center container card-footer mt-3 mb-2" style="background: #E9EBEE">
         <h6>
-            {{ basic_info.name_cn }}({{ basic_info.name_en }})&copy;<span id="years_now"></span> All&nbsp;Rights&nbsp;Reserved | Version:{{ version }} | 以上样式由系统自动生成
+            {{ basic_info.name_cn }}({{ basic_info.name_en }})&copy;<span id="years_now"></span> All&nbsp;Rights&nbsp;Reserved | Build:{{ version }} | 以上样式由系统自动生成
         </h6>
     </div>
     <script src="{% static 'resumes/libs/jquery/3.7.1/jquery.min.js' %}"></script>

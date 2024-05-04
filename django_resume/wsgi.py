@@ -1,5 +1,5 @@
 """
-WSGI config for proj_django_resume project.
+WSGI config for django_resume project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj_django_resume.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_resume.settings')
 
 application = get_wsgi_application()

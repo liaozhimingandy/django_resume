@@ -1,4 +1,4 @@
-x-resume-image: &resume-image liaozhiming/proj_django_resume:latest
+x-resume-image: &resume-image liaozhiming/django_resume:latest
 x-nginx-image: &nginx-image nginx:1.21.0
 
 version: '3.7'
@@ -6,7 +6,7 @@ version: '3.7'
 services:
   resume:
     image: *resume-image
-    command: gunicorn proj_django_resume.wsgi:application --workers 3 --bind :8000
+    command: gunicorn django_resume.wsgi:application --workers 3 --bind :8000
     env_file:
       - ./config/.env
     environment:
@@ -26,7 +26,7 @@ services:
     volumes:
       # - ./conf/nginx.conf:/etc/nginx/nginx.conf
       - ./config/resume_nginx.conf:/etc/nginx/conf.d/resume_nginx.conf
-      # - /d/PyCharm/proj_django_resume/proj_django_resume/config/resume_nginx.conf:/etc/nginx/nginx.conf
+      # - /d/PyCharm/django_resume/django_resume/config/resume_nginx.conf:/etc/nginx/nginx.conf
       - data_nginx_log:/var/log/nginx
       - data_static:/opt/app/static/
       - data_media:/opt/app/media

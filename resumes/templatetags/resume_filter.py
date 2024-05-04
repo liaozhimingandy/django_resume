@@ -5,7 +5,7 @@
 #   Copyright (C) 2022 liaozhimingandy@qq.com Ltd. All Rights Reserved.
 #
 #   @Author      : zhiming
-#   @Project     : proj_django_resume
+#   @Project     : django_resume
 #   @File Name   : resume_filter.py
 #   @Created Date: 2022-06-25 22:21
 #      @Software : PyCharm

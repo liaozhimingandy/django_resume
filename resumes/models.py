@@ -8,7 +8,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
 
-from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 from django.urls import reverse_lazy
 
 
@@ -49,7 +49,7 @@ class BasicInfo(CommonModel):
         Unknown = 9, '其它'
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="用户名",
-                             help_text='用于生成网址的唯一性,''先到先得原则, 简历预览地址为:<B> http://localhost:8000/resume/show/</B>')
+                             help_text='用于生成网址的唯一性,''先到先得原则, 简历预览地址为:<B> http://localhost:8000/resumes/用户名/</B>')
     name_cn = models.CharField('姓名', max_length=64, help_text='您的姓名')
     name_en = models.CharField('英文名称', max_length=64, default='', help_text='您的英文名字(可不填)')
     sex = models.CharField('性别', max_length=2, choices=SexEnum.choices, help_text='性别')
@@ -57,8 +57,8 @@ class BasicInfo(CommonModel):
     phone = models.CharField('您的手机号码', max_length=64, null=True, help_text="为了方便联系到您")
     avatar = models.ImageField('您的头像', null=True, upload_to='images/%Y')
     email = models.EmailField('电子邮箱', max_length=256, help_text='您的电子邮箱')
-    evaluation = RichTextField('自我描述', default='', help_text='填写你对自己的评价')
-    hobby = RichTextField('兴趣爱好', default='', help_text='填写你感兴趣的方面')
+    evaluation = CKEditor5Field('自我评价', config_name='default', default='', help_text='填写你对自己的评价')
+    hobby = CKEditor5Field('兴趣爱好', config_name='default', db_comment='兴趣爱好', default='', help_text='填写你感兴趣的方面')
     href = models.URLField("你的github地址", null=True, blank=True, default="", help_text="github地址")
     site = models.ForeignKey(Site, default=settings.SITE_ID, on_delete=models.CASCADE)
 
@@ -99,7 +99,7 @@ class BasicInfo(CommonModel):
 class Education(CommonModel):
     resume = models.ForeignKey(BasicInfo, on_delete=models.CASCADE, verbose_name='简历所属人', help_text='简历所属人')
     edu_unit = models.CharField('教育单位/机构', max_length=64, help_text='教育单位/机构')
-    edu_desc = RichTextField('教育描述', help_text='描述一下你的教育经历')
+    edu_desc = CKEditor5Field('教育描述', config_name='default', db_comment='教育描述', help_text='描述一下你的教育经历')
     certificate = models.CharField('证书', max_length=128, help_text='获取的证书名称')
     gmt_education_start = models.DateField('教育开始时间', help_text='教育开始时间')
     gmt_education_end = models.DateField('教育结束时间', help_text='教育结束时间', null=True, blank=True)
@@ -118,7 +118,7 @@ class WorkExperience(CommonModel):
     gmt_duration_start = models.DateField('工作开始时间', help_text='工作开始时间')
     gmt_duration_end = models.DateField('工作结束时间', help_text='工作结束时间', null=True, blank=True)
     work_position = models.CharField('工作岗位', max_length=64, help_text='工作岗位')
-    work_desc = RichTextField('工作内容', help_text='工作内容描述')
+    work_desc = CKEditor5Field('工作内容', help_text='工作内容描述')
     used_tech = models.TextField('使用到的技术', max_length=255,
                                  help_text='工作中使用到的技术,多个技术时,请使用逗号,进行分开')
 
@@ -132,7 +132,7 @@ class WorkExperience(CommonModel):
 
 class Skill(CommonModel):
     resume = models.ForeignKey(BasicInfo, on_delete=models.CASCADE, verbose_name='简历所属人', help_text='简历所属人')
-    skill = models.CharField('技能', max_length=32, help_text='技能描述')
+    skill = models.CharField('技能', db_comment='技能', max_length=32, help_text='技能描述')
     percent = models.PositiveSmallIntegerField('掌握程度', help_text='技能掌握程度', validators=[
         MaxValueValidator(100),
         MinValueValidator(1)
